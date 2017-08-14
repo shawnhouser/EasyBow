@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 echo -e "\n"
-javac -Xlint:deprecation -cp ".:spigot-1.12.jar" shawnh/EasyBow.java
+javac -Xlint:deprecation -Xlint:unchecked -cp ".:spigot-1.12.jar" shawnh/EasyBow.java
 echo "Compiled"
 jar cvfe EasyBow.jar shawnh/EasyBow.class shawnh/*.class plugin.yml > /dev/null
 echo "Jarified"

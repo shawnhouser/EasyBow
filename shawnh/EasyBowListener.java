@@ -18,21 +18,21 @@ import org.bukkit.scoreboard.*;
 public class EasyBowListener implements org.bukkit.event.Listener{
 	public EasyBowListener() {}
 	
-	Map<Player, Integer> playersArrows = new HashMap<Player, Integer>();
+	static Map<String, Integer> playersArrows;
 
 	@EventHandler
 	public void onPlayerInteract(PlayerInteractEvent event) {
 		Player p = event.getPlayer();
-
+		String pUUID = p.getUniqueId().toString();
 		if(event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK){
 			if(p.getInventory().getItemInMainHand().getType() == Material.BOW) {
-				if(playersArrows.get(p) == null){
-					playersArrows.put(p, 100);
+				if(playersArrows.get(pUUID) == null){
+					playersArrows.put(pUUID, 100);
 				}
-				if(playersArrows.get(p) >= 1){
-					playersArrows.put(p, playersArrows.get(p)-1);
+				if(playersArrows.get(pUUID) >= 1){
+					playersArrows.put(pUUID, playersArrows.get(pUUID)-1);
 					Entity arrow = p.launchProjectile(Arrow.class);
-					EasyBowInit.objective.getScore(p.getDisplayName()).setScore(playersArrows.get(p));
+					EasyBowInit.objective.getScore(p.getDisplayName()).setScore(playersArrows.get(pUUID));
 				}
 			}
 		}
@@ -51,12 +51,14 @@ public class EasyBowListener implements org.bukkit.event.Listener{
 		LivingEntity entity = e.getEntity();
 		if(entity instanceof Player && e.getItem().getItemStack().getType() == Material.ARROW){
 			Player p = (Player) entity;
+			String pUUID = p.getUniqueId().toString();
 			int amountOfArrows = e.getItem().getItemStack().getAmount();
-			playersArrows.put(p, playersArrows.get(p)+amountOfArrows);
-			EasyBowInit.objective.getScore(p.getDisplayName()).setScore(playersArrows.get(p));
+			playersArrows.put(pUUID, playersArrows.get(pUUID)+amountOfArrows);
+			EasyBowInit.objective.getScore(p.getDisplayName()).setScore(playersArrows.get(pUUID));
 			e.getItem().remove();
 			e.setCancelled(true);
 		}
-    }
+	}
+	
 }
 

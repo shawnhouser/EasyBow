@@ -3,6 +3,7 @@ package shawnh;
 import org.bukkit.scoreboard.*;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import java.util.logging.Logger;
 
 public class EasyBowInit {
 	public static Objective objective;
@@ -16,7 +17,13 @@ public class EasyBowInit {
 
 		for(Player online : Bukkit.getOnlinePlayers()){
 			online.setScoreboard(board);
-			objective.getScore(online.getDisplayName()).setScore(100);
+			try{
+				int arrows = EasyBowListener.playersArrows.get(online.getUniqueId().toString());
+				objective.getScore(online.getDisplayName()).setScore(arrows);
+
+			} catch(NullPointerException e){
+				objective.getScore(online.getDisplayName()).setScore(100);
+			}
 		}
 	}
 }
