@@ -1,6 +1,7 @@
 name: EasyBow
 main: shawnh.EasyBow
-version: 0.5
+version: 1.0
+author: UIC
 commands:
     easybow:
         usage: /EasyBow

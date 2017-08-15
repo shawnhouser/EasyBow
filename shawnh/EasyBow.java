@@ -14,42 +14,54 @@ public class EasyBow extends org.bukkit.plugin.java.JavaPlugin {
 		log.info("[EasyBow] Enabled");
 		EasyBowListener bow = new EasyBowListener();
 
-		EasyBowListener.playersArrows = loadHashMap("arrows");
-		EasyBowInit.init();
+		//EasyBowUtils.setHashMap(loadHashMap("arrows"));
+		EasyBowUtils.loadFromDisk(this);
 		getServer().getPluginManager().registerEvents(bow, this);
 	}
 	
 	public void onDisable() {
 		log.info("[EasyBow] Disabled");
-
-		this.getConfig().createSection("arrows", EasyBowListener.playersArrows);
-		this.saveConfig();
-		
+		EasyBowUtils.saveToDisk(this);	
 	}
 	
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String alias, String[] args) {
 		if(alias.equalsIgnoreCase("easybow")){
-			String messageToSend = "/easyBow: This Page\n" +
-								   "/easyBow amount: Number of arrows left\n"+
-								   "/easyBow add {number}: Add {number} arrows to your quiver";
-			String pUUID = ((Player) sender).getUniqueId().toString();
+			String messageToSend = "§6/easyBow§f This Page\n" +
+								   "§6/easyBow amount§f Number of arrows left\n"+
+								   "§6/easyBow set {number}§f Sets number of arrows in quiver\n"+
+								   "§6/easyBow change {number}§f Changes number of arrows quiver";
+			UUID pUUID = ((Player) sender).getUniqueId();
 			if(args.length != 0){
 				switch(args[0].toLowerCase()) {
-					case "amount": messageToSend = EasyBowListener.playersArrows.get(pUUID) + " arrow(s)"; break;
+					case "a": ;
+					case "arrows": ;
+					case "amount": messageToSend = "§3"+EasyBowUtils.getArrows(pUUID) + " arrow(s)"; break;
+					case "s": ;
+					case "set": 
+						if(args.length != 1) { try{
+							int amountOfArrows = Integer.parseInt(args[1]);
+							EasyBowUtils.setArrows(pUUID, amountOfArrows);
+							messageToSend = "You now have §3"+EasyBowUtils.getArrows(pUUID) + " arrow(s)";
+						} catch(NumberFormatException e){
+							messageToSend = "§c[EasyBow] Enter a valid Number";
+						}} break;
+					case "c": ;
+					case "change":
+						if(args.length != 1) { try{
+							int changeAmount = Integer.parseInt(args[1]);
+							EasyBowUtils.changeArrows(pUUID, changeAmount);
+							messageToSend = "You now have §3"+EasyBowUtils.getArrows(pUUID) + " arrow(s)";
+						} catch(NumberFormatException e){
+							messageToSend = "§c[EasyBow] Enter a valid Number";
+						}} break;
 					default: ; break;
 				}
 			}
-			sender.sendMessage(messageToSend);
+			if(messageToSend.length() != 0){
+				sender.sendMessage(messageToSend);
+			}
 		}
 		return true;
-	}
-
-	public HashMap<String, Integer> loadHashMap(String name) {
-		HashMap<String, Integer> hm = new HashMap<String, Integer>();
-		for (String key : this.getConfig().getConfigurationSection(name).getKeys(false)) {
-			hm.put(key, (Integer) this.getConfig().get(name+"."+key));
-		}
-		return hm;
 	}
 }

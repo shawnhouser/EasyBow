@@ -12,27 +12,19 @@ import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.inventory.*;
 import org.bukkit.entity.*;
 import org.bukkit.Material;
-import org.bukkit.scoreboard.*;
 
 
 public class EasyBowListener implements org.bukkit.event.Listener{
 	public EasyBowListener() {}
-	
-	static Map<String, Integer> playersArrows;
 
-	@EventHandler
+	@EventHandler // Fire an arrow when Right clicking with a bow, as long as you have enough arrows
 	public void onPlayerInteract(PlayerInteractEvent event) {
 		Player p = event.getPlayer();
-		String pUUID = p.getUniqueId().toString();
-		if(event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK){
-			if(p.getInventory().getItemInMainHand().getType() == Material.BOW) {
-				if(playersArrows.get(pUUID) == null){
-					playersArrows.put(pUUID, 100);
-				}
-				if(playersArrows.get(pUUID) >= 1){
-					playersArrows.put(pUUID, playersArrows.get(pUUID)-1);
+		UUID pUUID = p.getUniqueId();
+		if(event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK){ // If they Right Click
+			if(p.getInventory().getItemInMainHand().getType() == Material.BOW) { // If theyre holding a bow
+				if(EasyBowUtils.fireArrow(pUUID)){ // If they can fire an arrow
 					Entity arrow = p.launchProjectile(Arrow.class);
-					EasyBowInit.objective.getScore(p.getDisplayName()).setScore(playersArrows.get(pUUID));
 				}
 			}
 		}
@@ -51,10 +43,10 @@ public class EasyBowListener implements org.bukkit.event.Listener{
 		LivingEntity entity = e.getEntity();
 		if(entity instanceof Player && e.getItem().getItemStack().getType() == Material.ARROW){
 			Player p = (Player) entity;
-			String pUUID = p.getUniqueId().toString();
+			UUID pUUID = p.getUniqueId();
 			int amountOfArrows = e.getItem().getItemStack().getAmount();
-			playersArrows.put(pUUID, playersArrows.get(pUUID)+amountOfArrows);
-			EasyBowInit.objective.getScore(p.getDisplayName()).setScore(playersArrows.get(pUUID));
+			EasyBowUtils.changeArrows(pUUID, amountOfArrows);
+
 			e.getItem().remove();
 			e.setCancelled(true);
 		}
